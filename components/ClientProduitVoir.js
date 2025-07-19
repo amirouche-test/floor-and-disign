@@ -134,7 +134,9 @@ export default function ClientProduitVoir({ slug }) {
               <img src={product.image} alt={product.name} className="w-28 h-28 object-cover rounded-xl border shadow" />
               <div>
                 <h2 className="text-2xl font-semibold">{product.name}</h2>
-                <p className="text-gray-500 text-sm">Catégorie : {product.category}</p>
+                <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium text-blue-800 bg-blue-100">
+                {product.category}
+              </span>
                 <p className="text-gray-600">💰 {product.price} DA</p>
               </div>
             </div>
