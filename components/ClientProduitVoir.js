@@ -82,7 +82,7 @@ export default function ClientProduitVoir({ slug }) {
   return (
     <>
       {/* ✅ Container centré */}
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 font-sans">
 
         {/* Top bar */}
         <div className="flex justify-between items-center py-3 mb-6 border-b">
@@ -102,7 +102,7 @@ export default function ClientProduitVoir({ slug }) {
         </div>
 
         {/* Contenu principal */}
-        <div className="flex gap-6 mt-10">
+        <div className="flex gap-8 mt-10">
           {/* Zone gauche */}
           <div className="relative w-[450px] mx-auto overflow-hidden rounded-xl shadow border">
             <div className="absolute top-2 right-2 flex space-x-2 z-30">
@@ -131,9 +131,10 @@ export default function ClientProduitVoir({ slug }) {
           {/* Zone droite */}
           <div className="flex-1 flex flex-col space-y-5 items-end text-right">
             <div className="flex flex-row-reverse items-center gap-4">
-              <img src={product.image} alt={product.name} className="w-24 h-24 object-cover rounded-xl border shadow" />
+              <img src={product.image} alt={product.name} className="w-28 h-28 object-cover rounded-xl border shadow" />
               <div>
                 <h2 className="text-2xl font-semibold">{product.name}</h2>
+                <p className="text-gray-500 text-sm">Catégorie : {product.category}</p>
                 <p className="text-gray-600">💰 {product.price} DA</p>
               </div>
             </div>
@@ -153,14 +154,14 @@ export default function ClientProduitVoir({ slug }) {
             </div>
 
             {selectedMotif && (
-              <div className="w-80 h-24 overflow-y-auto flex flex-row-reverse flex-wrap gap-2 border rounded-xl p-2 shadow-sm">
+              <div className="w-full max-w-md h-32 overflow-y-auto flex flex-row-reverse flex-wrap gap-2 border rounded-xl p-2 shadow-sm">
                 {selectedMotif.calques.map((calque, idx) => {
                   const paletteColor = palette.find(p => p.nom === calque.couleur)
                   return (
                     <button
                       key={idx}
                       onClick={() => setSelectedColors(prev => ({ ...prev, [selectedMotif.nom]: calque.couleur }))}
-                      className={`w-6 h-6 rounded-full border transition ${
+                      className={`w-7 h-7 rounded-full border transition ${
                         selectedColors[selectedMotif.nom] === calque.couleur ? 'ring-2 ring-blue-600' : 'hover:scale-110'
                       }`}
                       style={{ backgroundColor: paletteColor?.hex || calque.couleur }}
