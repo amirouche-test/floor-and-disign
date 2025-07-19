@@ -187,7 +187,7 @@ export default function ClientProduitVoir({ slug }) {
               {product.description}
             </div>
           </div>
-        </div>
+        </div> 
 
         <div className="h-10" />
       </div>
