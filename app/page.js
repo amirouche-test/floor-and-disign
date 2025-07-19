@@ -63,7 +63,7 @@ export default function HomePage() {
 
         <div className="absolute bottom-40 left-1/2 transform -translate-x-1/2 text-center text-white z-20 px-4 w-full max-w-3xl">
           <h1 className="text-4xl md:text-5xl font-bold tracking-wide drop-shadow-lg font-serif">
-            L'élégance à chaque détail
+            L&apos;élégance à chaque détail
           </h1>
           <p className="mt-5 text-2xl text-white/90 leading-relaxed font-serif">
             Des collections pensées pour sublimer votre intérieur avec raffinement.
