@@ -80,106 +80,109 @@ export default function ClientProduitVoir({ slug }) {
   const sortedMotifs = [...product.motifs].sort((a, b) => a.nom.localeCompare(b.nom))
 
   return (
-    <div className="max-w-7xl mx-auto px-4">
+    <>
+      {/* ✅ Container centré */}
+      <div className="max-w-7xl mx-auto px-4">
 
-      {/* ✅ Top bar */}
-      <div className="flex justify-between items-center py-3 mb-6 border-b">
-        <button
-          onClick={() => window.history.back()}
-          className="flex items-center text-gray-700 hover:text-black"
-        >
-          <ChevronLeft className="w-5 h-5 mr-1" />
-          <span>Retour</span>
-        </button>
+        {/* Top bar */}
+        <div className="flex justify-between items-center py-3 mb-6 border-b">
+          <button
+            onClick={() => window.history.back()}
+            className="flex items-center text-gray-700 hover:text-black"
+          >
+            <ChevronLeft className="w-5 h-5 mr-1" />
+            <span>Retour</span>
+          </button>
 
-        <p className="text-sm text-gray-600 italic">Créez votre design unique</p>
+          <p className="text-sm text-gray-600 italic">Créez votre design unique</p>
 
-        <Link href="/">
-          <img src="/logo-2.svg" alt="Logo" className="h-10 w-auto" />
-        </Link>
-      </div>
-
-      {/* ✅ Contenu principal */}
-      <div className="flex gap-6 mt-10">
-        {/* Zone gauche */}
-        <div className="relative w-[450px] mx-auto overflow-hidden rounded-xl shadow border">
-          <div className="absolute top-2 right-2 flex space-x-2 z-30">
-            <button onClick={downloadImage} className="p-2 bg-white rounded-full border hover:bg-gray-100">
-              <Download size={20} />
-            </button>
-            <button onClick={resetSelections} className="p-2 bg-white rounded-full border hover:bg-gray-100">
-              <RefreshCcw size={20} />
-            </button>
-          </div>
-          <div id="preview-zone" className="relative w-full h-full">
-            <div className="absolute inset-0">
-              {product.motifs.map(motif => {
-                const color = selectedColors[motif.nom]
-                return motif.calques
-                  .filter(c => c.couleur === color)
-                  .map((calque, idx) => (
-                    <img key={idx} src={calque.image} alt="" className="absolute top-0 left-0 h-full" style={{ width: 'auto' }} />
-                  ))
-              })}
-            </div>
-            <img src="/Image-prototype-scaled.png" alt="Prototype" className="block w-full h-auto relative z-10" />
-          </div>
+          <Link href="/">
+            <img src="/logo-2.svg" alt="Logo" className="h-10 w-auto" />
+          </Link>
         </div>
 
-        {/* Zone droite */}
-        <div className="flex-1 flex flex-col space-y-5 items-end text-right">
-          <div className="flex flex-row-reverse items-center gap-4">
-            <img src={product.image} alt={product.name} className="w-24 h-24 object-cover rounded-xl border shadow" />
-            <div>
-              <h2 className="text-2xl font-semibold">{product.name}</h2>
-              <p className="text-gray-600">💰 {product.price} DA</p>
-            </div>
-          </div>
-
-          <div className="flex flex-row-reverse flex-wrap gap-2 w-full justify-start">
-            {sortedMotifs.map((motif, idx) => (
-              <button
-                key={idx}
-                onClick={() => setSelectedMotif(motif)}
-                className={`px-4 py-1.5 text-sm rounded-full border transition ${
-                  selectedMotif?.nom === motif.nom ? 'bg-blue-600 text-white' : 'bg-gray-50 hover:bg-gray-100'
-                }`}
-              >
-                {motif.nom}
+        {/* Contenu principal */}
+        <div className="flex gap-6 mt-10">
+          {/* Zone gauche */}
+          <div className="relative w-[450px] mx-auto overflow-hidden rounded-xl shadow border">
+            <div className="absolute top-2 right-2 flex space-x-2 z-30">
+              <button onClick={downloadImage} className="p-2 bg-white rounded-full border hover:bg-gray-100">
+                <Download size={20} />
               </button>
-            ))}
+              <button onClick={resetSelections} className="p-2 bg-white rounded-full border hover:bg-gray-100">
+                <RefreshCcw size={20} />
+              </button>
+            </div>
+            <div id="preview-zone" className="relative w-full h-full">
+              <div className="absolute inset-0">
+                {product.motifs.map(motif => {
+                  const color = selectedColors[motif.nom]
+                  return motif.calques
+                    .filter(c => c.couleur === color)
+                    .map((calque, idx) => (
+                      <img key={idx} src={calque.image} alt="" className="absolute top-0 left-0 h-full" style={{ width: 'auto' }} />
+                    ))
+                })}
+              </div>
+              <img src="/Image-prototype-scaled.png" alt="Prototype" className="block w-full h-auto relative z-10" />
+            </div>
           </div>
 
-          {selectedMotif && (
-            <div className="w-80 h-24 overflow-y-auto flex flex-row-reverse flex-wrap gap-2 border rounded-xl p-2 shadow-sm">
-              {selectedMotif.calques.map((calque, idx) => {
-                const paletteColor = palette.find(p => p.nom === calque.couleur)
-                return (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedColors(prev => ({ ...prev, [selectedMotif.nom]: calque.couleur }))}
-                    className={`w-6 h-6 rounded-full border transition ${
-                      selectedColors[selectedMotif.nom] === calque.couleur ? 'ring-2 ring-blue-600' : 'hover:scale-110'
-                    }`}
-                    style={{ backgroundColor: paletteColor?.hex || calque.couleur }}
-                  />
-                )
-              })}
+          {/* Zone droite */}
+          <div className="flex-1 flex flex-col space-y-5 items-end text-right">
+            <div className="flex flex-row-reverse items-center gap-4">
+              <img src={product.image} alt={product.name} className="w-24 h-24 object-cover rounded-xl border shadow" />
+              <div>
+                <h2 className="text-2xl font-semibold">{product.name}</h2>
+                <p className="text-gray-600">💰 {product.price} DA</p>
+              </div>
             </div>
-          )}
 
-          {/* ✅ Description du produit */}
-          <div className="text-gray-700 text-sm leading-relaxed max-w-md mt-4 border-t pt-2">
-            {product.description}
+            <div className="flex flex-row-reverse flex-wrap gap-2 w-full justify-start">
+              {sortedMotifs.map((motif, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setSelectedMotif(motif)}
+                  className={`px-4 py-1.5 text-sm rounded-full border transition ${
+                    selectedMotif?.nom === motif.nom ? 'bg-blue-600 text-white' : 'bg-gray-50 hover:bg-gray-100'
+                  }`}
+                >
+                  {motif.nom}
+                </button>
+              ))}
+            </div>
+
+            {selectedMotif && (
+              <div className="w-80 h-24 overflow-y-auto flex flex-row-reverse flex-wrap gap-2 border rounded-xl p-2 shadow-sm">
+                {selectedMotif.calques.map((calque, idx) => {
+                  const paletteColor = palette.find(p => p.nom === calque.couleur)
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedColors(prev => ({ ...prev, [selectedMotif.nom]: calque.couleur }))}
+                      className={`w-6 h-6 rounded-full border transition ${
+                        selectedColors[selectedMotif.nom] === calque.couleur ? 'ring-2 ring-blue-600' : 'hover:scale-110'
+                      }`}
+                      style={{ backgroundColor: paletteColor?.hex || calque.couleur }}
+                    />
+                  )
+                })}
+              </div>
+            )}
+
+            {/* Description */}
+            <div className="text-gray-700 text-sm leading-relaxed max-w-md mt-4 border-t pt-2">
+              {product.description}
+            </div>
           </div>
         </div>
+
+        {/* Espace avant footer */}
+        <div className="h-10" />
       </div>
 
-      {/* ✅ Espace avant footer */}
-      <div className="h-10" />
-
-      {/* ✅ Footer */}
+      {/* ✅ Footer full width */}
       <Footer />
-    </div>
+    </>
   )
 }
