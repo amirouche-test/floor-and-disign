@@ -11,7 +11,7 @@ export default function ClientProduitVoir({ slug }) {
   const [palette, setPalette] = useState([])
   const [selectedColors, setSelectedColors] = useState({})
   const [selectedMotif, setSelectedMotif] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   const fetchData = async () => {
@@ -37,9 +37,11 @@ export default function ClientProduitVoir({ slug }) {
       })
       setSelectedColors(initColors)
       setSelectedMotif(sortedMotifs[0] || null)
+
+      // ✅ Simuler un petit délai pour un effet plus fluide
+      setTimeout(() => setLoading(false), 600)
     } catch (err) {
       setError(err.message)
-    } finally {
       setLoading(false)
     }
   }
@@ -73,29 +75,34 @@ export default function ClientProduitVoir({ slug }) {
     }
   }
 
-  if (loading) return <div className="flex justify-center mt-20 text-lg">Chargement...</div>
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-[300px]">
+        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    )
+  }
+
   if (error) return <div className="text-red-600 text-center mt-10 text-lg">{error}</div>
-  if (!product) return <div className="text-center mt-10 text-lg">Produit non trouvé...</div>
 
   const sortedMotifs = [...product.motifs].sort((a, b) => a.nom.localeCompare(b.nom))
 
   return (
     <>
       <div className="max-w-7xl mx-auto px-4 font-sans text-gray-800 text-base">
-
         {/* ✅ Top bar */}
         <div className="flex justify-between items-center py-4 mb-8 border-b border-gray-200">
-        <button
-  onClick={() => window.history.back()}
-  className="flex items-center gap-2 text-xl text-neutral-700 hover:text-yellow-600 transition-colors duration-200"
->
-  <ChevronLeft className="w-6 h-6 text-yellow-500" />
-  <span>Retour</span>
-</button>
+          <button
+            onClick={() => window.history.back()}
+            className="flex items-center gap-2 text-xl text-neutral-700 hover:text-blue-600 transition-colors duration-200"
+          >
+            <ChevronLeft className="w-6 h-6 text-blue-500" />
+            <span>Retour</span>
+          </button>
 
-<p className="text-2xl font-semibold italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-[#a7792c] via-[#e0c187] to-[#a7792c] drop-shadow-sm hover:drop-shadow-md transition">
-  Composez votre design
-</p>
+          <p className="text-2xl font-semibold italic tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-blue-400 to-blue-600 drop-shadow-sm hover:drop-shadow-md transition">
+            Composez votre design
+          </p>
 
           <Link href="/">
             <img src="/logo-2.svg" alt="Logo" className="h-10 w-auto" />
@@ -176,11 +183,9 @@ export default function ClientProduitVoir({ slug }) {
               </div>
             )}
 
-            {/* Description */}
-<div className="bg-gray-50 rounded-xl p-4 shadow text-gray-700 text-base leading-relaxed max-w-md">
-  {product.description}
-</div>
-
+            <div className="bg-gray-50 rounded-xl p-4 shadow text-gray-700 text-base leading-relaxed max-w-md">
+              {product.description}
+            </div>
           </div>
         </div>
 
