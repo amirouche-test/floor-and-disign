@@ -1,6 +1,3 @@
-// app/api/product/slug/[slug]/route.js
-
-import { getNameBySlug } from '@/utils/slug'
 import { connectDB } from '@/lib/mongodb'
 import Product from '@/models/Product'
 import { NextResponse } from 'next/server'
@@ -8,10 +5,10 @@ import { NextResponse } from 'next/server'
 export async function GET(req, { params }) {
   try {
     await connectDB()
-    const regex = getNameBySlug(params.slug)
-    const product = await Product.findOne({ name: regex })
 
-    console.log("slug: " + regex);
+    // Cherche directement par le champ `slug`
+    const product = await Product.findOne({ slug: params.slug })
+
     if (!product) {
       return NextResponse.json({ message: 'Produit non trouvé' }, { status: 404 })
     }

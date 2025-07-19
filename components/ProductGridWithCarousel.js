@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { getSlugByName } from '@/utils/slug' // ✅ importer
 
 export default function ProductGridWithCarousel({ products }) {
   const visibleCount = 12
@@ -113,7 +112,7 @@ export default function ProductGridWithCarousel({ products }) {
 function ProductCard({ product, small = false }) {
   return (
     <Link
-      href={`/produit/${getSlugByName(product.name)}`}
+      href={`/produit/${product.slug}`}
       className={`group block rounded-xl overflow-hidden bg-white shadow hover:shadow-md transition-all ${small ? 'scale-90' : ''}`}
     >
       <div className="relative aspect-square overflow-hidden">
