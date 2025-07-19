@@ -1,0 +1,8 @@
+📁 NomDuProduit/
+├── 🖼️ image-principale.jpg
+├── 📂 motif1/
+│   ├── 🖼️ Blanc.png
+│   ├── 🖼️ Noir.png
+├── 📂 motif2/
+│   ├── 🖼️ Gris.png
+│   ├── 🖼️ Bleu.png

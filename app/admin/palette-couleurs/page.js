@@ -1,0 +1,286 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { SwatchIcon, PlusIcon, PencilIcon, TrashIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import Toast from '@/components/Toast'
+
+export default function PaletteCouleursPage() {
+  const [couleurs, setCouleurs] = useState([])
+  const [newNom, setNewNom] = useState('')
+  const [newHex, setNewHex] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [adding, setAdding] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [popup, setPopup] = useState({ message: '', type: '' })
+  const [selectedCouleur, setSelectedCouleur] = useState(null)
+  const [editNom, setEditNom] = useState('')
+  const [editHex, setEditHex] = useState('')
+
+  // Charger les couleurs
+  const fetchCouleurs = async () => {
+    try {
+      setLoading(true)
+      const res = await fetch('/api/palette-couleurs')
+      if (!res.ok) throw new Error('Impossible de charger les couleurs.')
+      const data = await res.json()
+      setCouleurs(data)
+    } catch (err) {
+      console.error(err)
+      showToast(err.message, 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchCouleurs()
+  }, [])
+
+  // Toast auto-disparition
+  const showToast = (message, type = 'info') => {
+    setPopup({ message, type })
+    setTimeout(() => setPopup({ message: '', type: '' }), 3000)
+  }
+
+  // Ajouter une couleur
+  const addCouleur = async () => {
+    if (!newNom.trim() || !/^#([0-9A-F]{3}){1,2}$/i.test(newHex)) {
+      showToast('Nom ou code hex invalide.', 'error')
+      return
+    }
+
+    if (couleurs.some(c => c.nom.toLowerCase() === newNom.trim().toLowerCase())) {
+      showToast('Cette couleur existe déjà.', 'error')
+      return
+    }
+
+    setAdding(true)
+    setProgress(30)
+
+    try {
+      const res = await fetch('/api/palette-couleurs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nom: newNom.trim(), hex: newHex })
+      })
+
+      setProgress(80)
+
+      if (!res.ok) {
+        const err = await res.json()
+        showToast(err.message || 'Erreur lors de l\'ajout.', 'error')
+      } else {
+        await fetchCouleurs()
+        setNewNom('')
+        setNewHex('')
+        showToast('Couleur ajoutée avec succès 🎉', 'success')
+      }
+    } catch (err) {
+      console.error(err)
+      showToast(err.message, 'error')
+    } finally {
+      setAdding(false)
+      setProgress(100)
+      setTimeout(() => setProgress(0), 800)
+    }
+  }
+
+  // Modifier une couleur
+  const updateCouleur = async () => {
+    if (!editNom.trim() || !/^#([0-9A-F]{3}){1,2}$/i.test(editHex)) {
+      showToast('Nom ou code hex invalide.', 'error')
+      return
+    }
+
+    if (
+      editNom.trim().toLowerCase() !== selectedCouleur.nom.toLowerCase() &&
+      couleurs.some(c => c.nom.toLowerCase() === editNom.trim().toLowerCase())
+    ) {
+      showToast('Un autre couleur porte déjà ce nom.', 'error')
+      return
+    }
+
+    try {
+      const res = await fetch(`/api/palette-couleurs/${encodeURIComponent(selectedCouleur._id)}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nom: editNom.trim(), hex: editHex })
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        showToast(err.message || 'Erreur lors de la modification.', 'error')
+      } else {
+        await fetchCouleurs()
+        showToast('Couleur modifiée avec succès ✏️', 'success')
+        setSelectedCouleur(null)
+      }
+    } catch (err) {
+      console.error(err)
+      showToast(err.message, 'error')
+    }
+  }
+
+  // Supprimer une couleur
+  const deleteCouleur = async () => {
+    if (!confirm('Voulez-vous vraiment supprimer cette couleur ?')) return
+
+    try {
+      const res = await fetch(`/api/palette-couleurs/${encodeURIComponent(selectedCouleur._id)}`, {
+        method: 'DELETE'
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        showToast(err.message || 'Erreur lors de la suppression.', 'error')
+      } else {
+        await fetchCouleurs()
+        showToast('Couleur supprimée ✅', 'success')
+        setSelectedCouleur(null)
+      }
+    } catch (err) {
+      console.error(err)
+      showToast(err.message, 'error')
+    }
+  }
+
+  return (
+    <main className="relative p-4 max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 text-gray-800">
+      
+      {/* Toast */}
+      {popup.message && <Toast message={popup.message} type={popup.type} />}
+
+      {/* Formulaire d'ajout */}
+      <div className="md:col-span-1 bg-white rounded-2xl shadow p-4 space-y-4">
+        <div className="flex items-center gap-2 mb-4 pb-1 border-b border-gray-100">
+          <PlusIcon className="w-6 h-6 text-green-700" />
+          <h1 className="text-xl font-semibold text-green-700">Ajouter une couleur</h1>
+        </div>
+
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs uppercase text-gray-500 mb-1">🎨 Nom</label>
+            <input
+              value={newNom}
+              onChange={(e) => setNewNom(e.target.value)}
+              placeholder="Ex: Bleu Ciel"
+              className="w-full px-3 py-2 border border-gray-300 rounded-xl 
+                         focus:outline-none focus:ring-1 focus:ring-green-500 transition duration-150"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs uppercase text-gray-500 mb-1">#️⃣ Code Hex</label>
+            <div className="flex items-center gap-2">
+              <input
+                value={newHex}
+                onChange={(e) => setNewHex(e.target.value)}
+                placeholder="#000000"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-xl 
+                           focus:outline-none focus:ring-1 focus:ring-green-500 transition duration-150"
+              />
+              <div className="w-10 h-10 rounded-full border border-gray-300 shadow" style={{ backgroundColor: newHex }} />
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={addCouleur}
+          disabled={adding}
+          className="mt-2 flex items-center justify-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-xl shadow hover:bg-green-700 disabled:opacity-50 transition"
+        >
+          <PlusIcon className="w-5 h-5" />
+          {adding ? 'Ajout...' : 'Ajouter & Enregistrer'}
+        </button>
+      </div>
+
+      {/* Palette */}
+      <div className="md:col-span-2 bg-white rounded-2xl shadow p-4">
+        <div className="flex items-center gap-2 mb-4 pb-1 border-b border-gray-100">
+          <SwatchIcon className="w-6 h-6 text-blue-700" />
+          <h2 className="text-lg font-semibold text-blue-700">Palette de couleurs</h2>
+        </div>
+
+        {loading ? (
+          <div className="flex justify-center my-8">
+            <div className="w-8 h-8 animate-spin border-4 border-blue-500 border-t-transparent rounded-full" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-14 sm:grid-cols-16 md:grid-cols-20 gap-2 max-h-[300px] overflow-y-auto p-1">
+            {couleurs.map((c, idx) => (
+              <div
+                key={idx}
+                onClick={() => { setSelectedCouleur(c); setEditNom(c.nom); setEditHex(c.hex) }}
+                className="w-6 h-6 rounded-full border border-gray-200 shadow cursor-pointer"
+                style={{ backgroundColor: c.hex }}
+                title={c.nom}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Progress bar */}
+      {adding && (
+        <div className="fixed bottom-0 left-0 w-full h-2 bg-gray-200">
+          <div className="bg-green-600 h-2 transition-all duration-300" style={{ width: `${progress}%` }} />
+        </div>
+      )}
+
+      {/* Modal édition */}
+      {selectedCouleur && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4">
+            <button
+              onClick={() => setSelectedCouleur(null)}
+              className="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition"
+            >
+              <XMarkIcon className="w-6 h-6" />
+            </button>
+
+            <h2 className="text-xl font-semibold text-blue-700">Modifier la couleur</h2>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs uppercase text-gray-500 mb-1">🎨 Nom</label>
+                <input
+                  value={editNom}
+                  onChange={(e) => setEditNom(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-xl 
+                             focus:outline-none focus:ring-1 focus:ring-blue-500 transition duration-150"
+                />
+              </div>
+              <div>
+                <label className="block text-xs uppercase text-gray-500 mb-1">#️⃣ Code Hex</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    value={editHex}
+                    onChange={(e) => setEditHex(e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-xl 
+                               focus:outline-none focus:ring-1 focus:ring-blue-500 transition duration-150"
+                  />
+                  <div className="w-10 h-10 rounded-full border border-gray-300 shadow" style={{ backgroundColor: editHex }} />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={updateCouleur}
+                className="flex-1 bg-blue-600 text-white py-2.5 rounded-xl shadow hover:bg-blue-700 transition"
+              >
+                <PencilIcon className="w-5 h-5 inline mr-1" /> Modifier
+              </button>
+              <button
+                onClick={deleteCouleur}
+                className="flex-1 bg-red-600 text-white py-2.5 rounded-xl shadow hover:bg-red-700 transition"
+              >
+                <TrashIcon className="w-5 h-5 inline mr-1" /> Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </main>
+  )
+}

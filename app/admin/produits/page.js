@@ -1,0 +1,243 @@
+'use client'
+
+import EditProductModal from '@/components/EditProductModal'
+import { useState, useEffect } from 'react'
+import dayjs from 'dayjs'
+import { PencilIcon, TrashIcon, ArchiveBoxIcon } from '@heroicons/react/24/outline'
+import { ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from '@heroicons/react/20/solid'
+import Link from 'next/link'
+
+const categoryColors = {
+  Textile: 'bg-blue-100 text-blue-700',
+  Décoration: 'bg-green-100 text-green-700',
+  Accessoire: 'bg-yellow-100 text-yellow-700',
+}
+
+export default function ProduitsPage() {
+  const [produits, setProduits] = useState([])
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [openedMotif, setOpenedMotif] = useState(null)
+  const [editingProduct, setEditingProduct] = useState(null)
+  const [deletingProductId, setDeletingProductId] = useState(null)
+  const [deleteProgress, setDeleteProgress] = useState(0)
+  const [toast, setToast] = useState({ message: '', type: '' })
+
+  const limit = 4
+
+  useEffect(() => {
+    async function fetchProduits() {
+      setLoading(true)
+      setError(null)
+      try {
+        const res = await fetch(`/api/products?page=${page}&limit=${limit}`)
+        if (!res.ok) throw new Error('Erreur de récupération')
+        const data = await res.json()
+        const sorted = [...data.products].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        setProduits(sorted)
+        setTotalPages(data.totalPages)
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProduits()
+  }, [page])
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type })
+    setTimeout(() => setToast({ message: '', type: '' }), 3000)
+  }
+
+  const handleDeleteProduct = async (product) => {
+    if (!confirm(`Supprimer définitivement "${product.name}" ?`)) return
+
+    setDeletingProductId(product._id)
+    setDeleteProgress(5)
+
+    try {
+      const interval = setInterval(() => {
+        setDeleteProgress((prev) => (prev < 90 ? prev + 10 : prev))
+      }, 150)
+
+      const res = await fetch(`/api/products/${product._id}`, { method: 'DELETE' })
+
+      clearInterval(interval)
+      setDeleteProgress(100)
+
+      if (!res.ok) {
+        const data = await res.json()
+        showToast(`Erreur: ${data.message || 'Suppression échouée'}`, 'error')
+      } else {
+        setProduits((prev) => prev.filter((p) => p._id !== product._id))
+        showToast('Produit supprimé avec succès ✅')
+      }
+    } catch (err) {
+      console.error(err)
+      showToast('Erreur serveur', 'error')
+    } finally {
+      setTimeout(() => {
+        setDeletingProductId(null)
+        setDeleteProgress(0)
+      }, 800)
+    }
+  }
+
+  return (
+    <main className="relative p-5 max-w-screen-xl mx-auto bg-white min-h-[70vh] text-gray-800">
+      
+      {/* ✅ Toast */}
+      {toast.message && (
+        <div className={`fixed top-28 left-1/2 -translate-x-1/2 px-4 py-2 rounded shadow text-white
+          ${toast.type === 'error' ? 'bg-red-600' : 'bg-green-600'}`}>
+          {toast.message}
+        </div>
+      )}
+
+      <div className="flex items-center justify-center gap-2 mb-6">
+        <ArchiveBoxIcon className="w-6 h-6 text-blue-700" />
+        <h1 className="text-2xl sm:text-3xl font-semibold text-blue-700">Tous les produits</h1>
+      </div>
+
+      {loading && (
+        <div className="flex justify-center my-8">
+          <div className="w-7 h-7 animate-spin border-4 border-blue-500 border-t-transparent rounded-full" />
+        </div>
+      )}
+
+      {error && <p className="text-center text-red-600">{error}</p>}
+
+      {!loading && produits.length === 0 && (
+        <p className="text-center text-gray-500 mt-8">Aucun produit trouvé.</p>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        {produits.map((p) => (
+          <div key={p._id} className="bg-gray-50 p-4 rounded-xl border shadow-sm space-y-3 relative">
+            <div className="flex items-start gap-4">
+              <img src={p.image} alt={p.name} className="w-20 h-20 object-cover rounded border" />
+
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-base sm:text-lg font-semibold truncate">{p.name}</h2>
+                  <span className="text-xs text-gray-400 italic">{dayjs(p.createdAt).format('DD/MM/YYYY HH:mm')}</span>
+                  <span className="text-xs text-gray-400 italic">| Maj {dayjs(p.updatedAt).format('DD/MM/YYYY HH:mm')}</span>
+                </div>
+
+                <p className="text-sm text-gray-700 mt-1">
+                  {p.description.length > 80 ? p.description.slice(0, 80) + '…' : p.description}
+                </p>
+
+                <div className="flex flex-wrap gap-1.5 mt-2 items-center">
+                  <span className="text-xs font-medium text-gray-800">{p.price ? `💰 ${p.price} DA` : 'Prix non défini'}</span>
+                  {p.category.map((cat) => (
+                    <span key={cat} className={`text-[11px] px-2 py-0.5 rounded-full ml-2 ${categoryColors[cat] || 'bg-gray-100 text-gray-700'}`}>
+                      {cat}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap gap-1.5 mt-3 relative">
+                  {p.motifs.map((motif, idx) => {
+                    const isOpen = openedMotif?.produitId === p._id && openedMotif.motifIndex === idx
+                    return (
+                      <div key={idx} className="relative">
+                        <button
+                          onClick={() => isOpen ? setOpenedMotif(null) : setOpenedMotif({ produitId: p._id, motifIndex: idx })}
+                          className={`text-xs px-2.5 py-0.5 rounded ${isOpen ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
+                          {motif.nom}
+                        </button>
+                        {isOpen && (
+                          <div className="absolute z-20 left-0 mt-1 w-[260px] bg-white border border-gray-200 rounded-xl shadow-lg p-2 max-h-[200px] overflow-y-auto">
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="text-xs font-semibold text-gray-800">{motif.nom}</span>
+                              <button onClick={() => setOpenedMotif(null)} className="p-0.5 text-gray-400 hover:text-red-500">
+                                <XMarkIcon className="w-4 h-4" />
+                              </button>
+                            </div>
+                            {motif.calques.map((c, i) => (
+                              <div key={i} className="flex items-center gap-2 hover:bg-gray-50 rounded p-1">
+                                <img src={c.image} alt={c.couleur} className="w-9 h-9 object-cover rounded border" />
+                                <span className="text-xs text-gray-800 truncate min-w-[90px]">{c.couleur}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center gap-2 text-xs text-gray-500">
+                {/* ✅ bouton Voir */}
+                <Link href={`/admin/produits/${p._id}`}>
+                  <button className="p-2 bg-yellow-100 rounded hover:bg-yellow-200" title="Voir">
+                    👁️
+                  </button>
+                </Link>
+
+                <button onClick={() => setEditingProduct(p)} className="p-2 bg-blue-100 rounded hover:bg-blue-200" title="Éditer">
+                  <PencilIcon className="w-4.5 h-4.5 text-blue-600" />
+                </button>
+
+                <button onClick={() => handleDeleteProduct(p)} className="p-2 bg-red-100 rounded hover:bg-red-200" title="Supprimer">
+                  <TrashIcon className="w-4.5 h-4.5 text-red-600" />
+                </button>
+              </div>
+            </div>
+
+            {deletingProductId === p._id && (
+              <div className="mt-2">
+                <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                  <div className="bg-red-600 h-full transition-all duration-200" style={{ width: `${deleteProgress}%` }} />
+                </div>
+                <div className="text-xs text-red-600 text-center mt-1">Suppression... {deleteProgress}%</div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="flex justify-center items-center gap-4 mt-10">
+        <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
+          className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 hover:bg-blue-200 disabled:opacity-40">
+          <ChevronLeftIcon className="w-6 h-6 text-blue-700" />
+        </button>
+        <span className="text-base font-semibold text-gray-700">Page {page} / {totalPages}</span>
+        <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+          className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 hover:bg-blue-200 disabled:opacity-40">
+          <ChevronRightIcon className="w-6 h-6 text-blue-700" />
+        </button>
+      </div>
+
+      {/* ✅ Modal édition */}
+      {editingProduct && (
+        <EditProductModal
+          product={editingProduct}
+          onClose={() => setEditingProduct(null)}
+          onSave={async (updatedProduct) => {
+            try {
+              const res = await fetch(`/api/products/${updatedProduct._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedProduct),
+              })
+              if (!res.ok) throw new Error('Erreur lors de la mise à jour')
+
+              setProduits((prev) => prev.map((p) => (p._id === updatedProduct._id ? updatedProduct : p)))
+              showToast('Produit mis à jour avec succès ✅')
+              setEditingProduct(null)
+            } catch (err) {
+              console.error(err)
+              showToast('Erreur lors de la mise à jour', 'error')
+            }
+          }}
+        />
+      )}
+    </main>
+  )
+}
