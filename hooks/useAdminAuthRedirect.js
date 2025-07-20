@@ -7,14 +7,28 @@ export default function useAdminAuthRedirect(redirectIfAuth = true) {
   const router = useRouter()
 
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem('admin-auth')
-
-    if (redirectIfAuth && isAuthenticated) {
-      router.replace('/admin/dashboard')
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/users/me', { cache: 'no-store' })
+        if (res.ok) {
+          // Utilisateur connecté
+          if (redirectIfAuth) {
+            router.replace('/admin/dashboard')
+          }
+        } else {
+          // Non connecté
+          if (!redirectIfAuth) {
+            router.replace('/admin')
+          }
+        }
+      } catch (err) {
+        console.error(err)
+        if (!redirectIfAuth) {
+          router.replace('/admin')
+        }
+      }
     }
 
-    if (!redirectIfAuth && !isAuthenticated) {
-      router.replace('/admin')
-    }
+    checkAuth()
   }, [redirectIfAuth])
 }

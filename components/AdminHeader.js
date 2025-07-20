@@ -17,11 +17,19 @@ export default function AdminHeader() {
     } else {
       setIsLogged(true)
     }
-  }, [])
+  }, [router])
 
-  const handleLogout = () => {
-    localStorage.removeItem('admin-auth')
-    router.push('/admin')
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/users/logout', { method: 'POST' })
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion', error)
+    } finally {
+      localStorage.removeItem('admin-auth')
+      // 🔄 Recharge pour s'assurer que tout est bien nettoyé
+      router.push('/admin')
+      router.refresh() // force un refresh si besoin
+    }
   }
 
   if (!isLogged) return null
@@ -47,7 +55,7 @@ export default function AdminHeader() {
   return (
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
-        
+
         {/* ✅ Logo */}
         <Link href="/admin/dashboard" className="text-2xl font-bold tracking-tight text-gray-800 flex items-center gap-1">
           <span className="font-serif">Floor</span>
