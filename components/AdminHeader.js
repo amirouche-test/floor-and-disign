@@ -73,7 +73,7 @@ export default function AdminHeader() {
           </Link>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-full text-sm transition"
+            className="flex items-center cursor-pointer gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-full text-sm transition"
           >
             <FiLogOut size={16} />
             <span className="hidden sm:inline font-medium">Logout</span>

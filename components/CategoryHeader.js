@@ -74,7 +74,7 @@ export default function CategoryHeader({ activeCategory }) {
             'INTEMPOREL',
             'GRAPHIQUES',
             'PRESTIGE',
-            'ETHNIQUE',
+            'ETHINIQUE',
             'BAGUETTES',
             'INSPIRATION',
           ].map((name) => {

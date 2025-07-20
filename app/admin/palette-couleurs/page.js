@@ -16,7 +16,7 @@ export default function PaletteCouleursPage() {
   const [editNom, setEditNom] = useState('')
   const [editHex, setEditHex] = useState('')
 
-  // Charger les couleurs
+  // Charger couleurs
   const fetchCouleurs = async () => {
     try {
       setLoading(true)
@@ -36,36 +36,31 @@ export default function PaletteCouleursPage() {
     fetchCouleurs()
   }, [])
 
-  // Toast auto-disparition
+  // Toast
   const showToast = (message, type = 'info') => {
     setPopup({ message, type })
     setTimeout(() => setPopup({ message: '', type: '' }), 3000)
   }
 
-  // Ajouter une couleur
+  // Ajouter
   const addCouleur = async () => {
     if (!newNom.trim() || !/^#([0-9A-F]{3}){1,2}$/i.test(newHex)) {
       showToast('Nom ou code hex invalide.', 'error')
       return
     }
-
     if (couleurs.some(c => c.nom.toLowerCase() === newNom.trim().toLowerCase())) {
       showToast('Cette couleur existe déjà.', 'error')
       return
     }
-
     setAdding(true)
-    setProgress(30)
-
+    setProgress(20)
     try {
       const res = await fetch('/api/palette-couleurs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nom: newNom.trim(), hex: newHex })
       })
-
       setProgress(80)
-
       if (!res.ok) {
         const err = await res.json()
         showToast(err.message || 'Erreur lors de l\'ajout.', 'error')
@@ -73,7 +68,7 @@ export default function PaletteCouleursPage() {
         await fetchCouleurs()
         setNewNom('')
         setNewHex('')
-        showToast('Couleur ajoutée avec succès 🎉', 'success')
+        showToast('Couleur ajoutée 🎉', 'success')
       }
     } catch (err) {
       console.error(err)
@@ -81,17 +76,16 @@ export default function PaletteCouleursPage() {
     } finally {
       setAdding(false)
       setProgress(100)
-      setTimeout(() => setProgress(0), 800)
+      setTimeout(() => setProgress(0), 600)
     }
   }
 
-  // Modifier une couleur
+  // Modifier
   const updateCouleur = async () => {
     if (!editNom.trim() || !/^#([0-9A-F]{3}){1,2}$/i.test(editHex)) {
       showToast('Nom ou code hex invalide.', 'error')
       return
     }
-
     if (
       editNom.trim().toLowerCase() !== selectedCouleur.nom.toLowerCase() &&
       couleurs.some(c => c.nom.toLowerCase() === editNom.trim().toLowerCase())
@@ -99,20 +93,18 @@ export default function PaletteCouleursPage() {
       showToast('Un autre couleur porte déjà ce nom.', 'error')
       return
     }
-
     try {
       const res = await fetch(`/api/palette-couleurs/${encodeURIComponent(selectedCouleur._id)}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nom: editNom.trim(), hex: editHex })
       })
-
       if (!res.ok) {
         const err = await res.json()
         showToast(err.message || 'Erreur lors de la modification.', 'error')
       } else {
         await fetchCouleurs()
-        showToast('Couleur modifiée avec succès ✏️', 'success')
+        showToast('Couleur modifiée ✏️', 'success')
         setSelectedCouleur(null)
       }
     } catch (err) {
@@ -121,15 +113,13 @@ export default function PaletteCouleursPage() {
     }
   }
 
-  // Supprimer une couleur
+  // Supprimer
   const deleteCouleur = async () => {
     if (!confirm('Voulez-vous vraiment supprimer cette couleur ?')) return
-
     try {
       const res = await fetch(`/api/palette-couleurs/${encodeURIComponent(selectedCouleur._id)}`, {
         method: 'DELETE'
       })
-
       if (!res.ok) {
         const err = await res.json()
         showToast(err.message || 'Erreur lors de la suppression.', 'error')
@@ -145,39 +135,38 @@ export default function PaletteCouleursPage() {
   }
 
   return (
-    <main className="relative p-4 max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 text-gray-800">
-      
-      {/* Toast */}
+    <main className="relative p-4 max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 text-gray-800">
+
       {popup.message && <Toast message={popup.message} type={popup.type} />}
 
-      {/* Formulaire d'ajout */}
-      <div className="md:col-span-1 bg-white rounded-2xl shadow p-4 space-y-4">
-        <div className="flex items-center gap-2 mb-4 pb-1 border-b border-gray-100">
+      {/* Formulaire */}
+      <div className="md:col-span-1 bg-white rounded-2xl shadow p-6 space-y-5">
+        <div className="flex items-center gap-2 pb-3 border-b border-gray-100">
           <PlusIcon className="w-6 h-6 text-green-700" />
           <h1 className="text-xl font-semibold text-green-700">Ajouter une couleur</h1>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div>
-            <label className="block text-xs uppercase text-gray-500 mb-1">🎨 Nom</label>
+            <label className="block text-xs font-semibold text-gray-500 mb-1">🎨 Nom</label>
             <input
               value={newNom}
               onChange={(e) => setNewNom(e.target.value)}
               placeholder="Ex: Bleu Ciel"
-              className="w-full px-3 py-2 border border-gray-300 rounded-xl 
-                         focus:outline-none focus:ring-1 focus:ring-green-500 transition duration-150"
+              className="w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm 
+                         focus:outline-none focus:ring-2 focus:ring-green-500 transition"
             />
           </div>
 
           <div>
-            <label className="block text-xs uppercase text-gray-500 mb-1">#️⃣ Code Hex</label>
+            <label className="block text-xs font-semibold text-gray-500 mb-1">#️⃣ Code Hex</label>
             <div className="flex items-center gap-2">
               <input
                 value={newHex}
                 onChange={(e) => setNewHex(e.target.value)}
                 placeholder="#000000"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-xl 
-                           focus:outline-none focus:ring-1 focus:ring-green-500 transition duration-150"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-xl shadow-sm 
+                           focus:outline-none focus:ring-2 focus:ring-green-500 transition"
               />
               <div className="w-10 h-10 rounded-full border border-gray-300 shadow" style={{ backgroundColor: newHex }} />
             </div>
@@ -187,7 +176,7 @@ export default function PaletteCouleursPage() {
         <button
           onClick={addCouleur}
           disabled={adding}
-          className="mt-2 flex items-center justify-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-xl shadow hover:bg-green-700 disabled:opacity-50 transition"
+          className="mt-3 flex cursor-pointer items-center justify-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-xl shadow hover:bg-green-700 disabled:opacity-50 transition"
         >
           <PlusIcon className="w-5 h-5" />
           {adding ? 'Ajout...' : 'Ajouter & Enregistrer'}
@@ -195,23 +184,25 @@ export default function PaletteCouleursPage() {
       </div>
 
       {/* Palette */}
-      <div className="md:col-span-2 bg-white rounded-2xl shadow p-4">
-        <div className="flex items-center gap-2 mb-4 pb-1 border-b border-gray-100">
+      <div className="md:col-span-2 bg-white rounded-2xl shadow p-6">
+        <div className="flex items-center gap-2 pb-3 border-b border-gray-100">
           <SwatchIcon className="w-6 h-6 text-blue-700" />
           <h2 className="text-lg font-semibold text-blue-700">Palette de couleurs</h2>
         </div>
 
         {loading ? (
-          <div className="flex justify-center my-8">
-            <div className="w-8 h-8 animate-spin border-4 border-blue-500 border-t-transparent rounded-full" />
+          <div className="grid grid-cols-20 gap-2 mt-4">
+            {Array.from({ length: 20 }).map((_, idx) => (
+              <div key={idx} className="w-6 h-6 rounded-full bg-gray-200 animate-pulse" />
+            ))}
           </div>
         ) : (
-          <div className="grid grid-cols-14 sm:grid-cols-16 md:grid-cols-20 gap-2 max-h-[300px] overflow-y-auto p-1">
+          <div className="grid grid-cols-14 sm:grid-cols-16 md:grid-cols-20 gap-2 max-h-[300px] overflow-y-auto p-1 mt-2">
             {couleurs.map((c, idx) => (
               <div
                 key={idx}
                 onClick={() => { setSelectedCouleur(c); setEditNom(c.nom); setEditHex(c.hex) }}
-                className="w-6 h-6 rounded-full border border-gray-200 shadow cursor-pointer"
+                className="w-6 h-6 rounded-full border border-gray-200 shadow cursor-pointer hover:scale-110 transition"
                 style={{ backgroundColor: c.hex }}
                 title={c.nom}
               />
@@ -220,14 +211,14 @@ export default function PaletteCouleursPage() {
         )}
       </div>
 
-      {/* Progress bar */}
+      {/* Progress bar fine et fluide */}
       {adding && (
-        <div className="fixed bottom-0 left-0 w-full h-2 bg-gray-200">
-          <div className="bg-green-600 h-2 transition-all duration-300" style={{ width: `${progress}%` }} />
+        <div className="fixed bottom-0 left-0 w-full h-1 bg-gray-200">
+          <div className="bg-green-600 h-1 transition-all duration-300" style={{ width: `${progress}%` }} />
         </div>
       )}
 
-      {/* Modal édition */}
+      {/* Modale édition */}
       {selectedCouleur && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4">
@@ -240,24 +231,24 @@ export default function PaletteCouleursPage() {
 
             <h2 className="text-xl font-semibold text-blue-700">Modifier la couleur</h2>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <label className="block text-xs uppercase text-gray-500 mb-1">🎨 Nom</label>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">🎨 Nom</label>
                 <input
                   value={editNom}
                   onChange={(e) => setEditNom(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-xl 
-                             focus:outline-none focus:ring-1 focus:ring-blue-500 transition duration-150"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-xl shadow-sm 
+                             focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                 />
               </div>
               <div>
-                <label className="block text-xs uppercase text-gray-500 mb-1">#️⃣ Code Hex</label>
+                <label className="block text-xs font-semibold text-gray-500 mb-1">#️⃣ Code Hex</label>
                 <div className="flex items-center gap-2">
                   <input
                     value={editHex}
                     onChange={(e) => setEditHex(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-xl 
-                               focus:outline-none focus:ring-1 focus:ring-blue-500 transition duration-150"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-xl shadow-sm 
+                               focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                   />
                   <div className="w-10 h-10 rounded-full border border-gray-300 shadow" style={{ backgroundColor: editHex }} />
                 </div>

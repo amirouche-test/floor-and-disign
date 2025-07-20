@@ -36,20 +36,9 @@ export default function ProductGridWithCarousel({ products }) {
     return () => clearInterval(interval)
   }, [remainingProducts.length, carouselVisible])
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <div className="flex space-x-1 text-4xl text-gray-700">
-          <span className="animate-bounce">.</span>
-          <span className="animate-bounce delay-200">.</span>
-          <span className="animate-bounce delay-400">.</span>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12">
+      {/* ✅ Titre et sous-titre toujours affichés */}
       <h2 className="text-center text-4xl md:text-5xl font-light tracking-wide mb-4 bg-gradient-to-r from-gray-800 via-gray-600 to-gray-800 bg-clip-text text-transparent">
         Nos Produits Exclusifs
       </h2>
@@ -57,12 +46,18 @@ export default function ProductGridWithCarousel({ products }) {
         Une sélection pensée pour sublimer votre intérieur avec élégance et modernité.
       </p>
 
+      {/* ✅ Grid principale */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-7">
-        {visibleProducts.map((product) => (
-          <ProductCard key={product._id} product={product} />
-        ))}
+        {loading
+          ? [...Array(visibleCount)].map((_, idx) => (
+              <div key={idx} className="rounded-xl bg-gray-100 shadow h-40 sm:h-52 md:h-60 animate-pulse"></div>
+            ))
+          : visibleProducts.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
       </div>
 
+      {/* ✅ Carousel */}
       {remainingProducts.length > 0 && (
         <div className="mt-12 relative rounded-xl bg-gray-50 shadow-inner px-4 py-4">
           <div className="flex items-center">
@@ -81,11 +76,15 @@ export default function ProductGridWithCarousel({ products }) {
                   transform: `translateX(-${(carouselIndex * 100) / carouselVisible}%)`,
                 }}
               >
-                {remainingProducts.map((product) => (
-                  <div key={product._id} className="flex-shrink-0 w-[14%]">
-                    <ProductCard product={product} small />
-                  </div>
-                ))}
+                {loading
+                  ? [...Array(remainingProducts.length)].map((_, idx) => (
+                      <div key={idx} className="flex-shrink-0 w-[14%] rounded-xl bg-gray-100 shadow h-32 animate-pulse"></div>
+                    ))
+                  : remainingProducts.map((product) => (
+                      <div key={product._id} className="flex-shrink-0 w-[14%]">
+                        <ProductCard product={product} small />
+                      </div>
+                    ))}
               </div>
             </div>
 

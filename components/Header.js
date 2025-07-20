@@ -41,7 +41,7 @@ export default function Header() {
         {/* GAUCHE */}
         <Link
           href="/la-marque"
-          className="text-lg font-medium hover:text-blue-500 transition-colors"
+          className="text-lg font-medium hover:text-blue-400 transition-colors"
         >
           LA MARQUE
         </Link>
@@ -61,7 +61,7 @@ export default function Header() {
         {/* DROITE */}
         <Link
           href="/simulateur-3d"
-          className="text-lg font-medium hover:text-blue-500 transition-colors"
+          className="text-lg font-medium hover:text-blue-400 transition-colors"
         >
           SIMULATEUR 3D
         </Link>
@@ -81,14 +81,14 @@ export default function Header() {
             'INTEMPOREL',
             'GRAPHIQUES',
             'PRESTIGE',
-            'ETHNIQUE',
+            'ETHINIQUE',
             'BAGUETTES',
             'INSPIRATION',
           ].map((name) => (
             <li key={name}>
               <Link
                 href={`/categorie/${name.toLowerCase()}`}
-                className="relative hover:text-blue-500 transition-colors duration-300
+                className="relative hover:text-blue-400 transition-colors duration-300
                   after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-[1px]
                   after:w-0 hover:after:w-full after:bg-blue-500 after:transition-all after:duration-500"
               >

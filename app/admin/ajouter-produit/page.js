@@ -85,7 +85,6 @@ export default function AjouterProduitPage() {
     }
 
     try {
-      // ✏️ Vérifier si le produit existe déjà avant d'uploader
       const checkRes = await fetch('/api/products/exists', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -169,17 +168,15 @@ export default function AjouterProduitPage() {
       )}
 
       {/* Formulaire */}
-      <div className="md:col-span-2 space-y-4 bg-white rounded-2xl shadow p-4">
-        <div className="flex items-center gap-2 mb-4 pb-1 border-b border-gray-100">
+      <div className="md:col-span-2 space-y-4 bg-white rounded-2xl shadow p-6">
+        <div className="flex items-center gap-2 pb-2 border-b border-gray-100 mb-3">
           <ArchiveBoxIcon className="w-6 h-6 text-blue-700" />
-          <h1 className="text-xl sm:text-2xl font-semibold text-blue-700">Ajouter un produit</h1>
+          <h1 className="text-2xl font-semibold text-blue-700">Ajouter un produit</h1>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div>
-            <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">
-              📁 Dossier du produit
-            </label>
+            <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">📁 Dossier du produit</label>
             <input
               type="file"
               webkitdirectory="true"
@@ -191,9 +188,7 @@ export default function AjouterProduitPage() {
           </div>
 
           <div>
-            <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">
-              📝 Description
-            </label>
+            <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">📝 Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -203,9 +198,7 @@ export default function AjouterProduitPage() {
           </div>
 
           <div>
-            <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">
-              🏷️ Catégories
-            </label>
+            <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">🏷️ Catégories</label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {CATEGORIES.map((cat) => (
                 <label key={cat} className="flex items-center gap-1 text-sm">
@@ -222,9 +215,7 @@ export default function AjouterProduitPage() {
           </div>
 
           <div>
-            <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">
-              💰 Prix
-            </label>
+            <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">💰 Prix</label>
             <input
               type="number"
               value={price}
@@ -238,7 +229,7 @@ export default function AjouterProduitPage() {
         <button
           disabled={!structure || loading}
           onClick={handleUploadAndSave}
-          className="mt-2 inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl shadow hover:bg-blue-700 disabled:opacity-50 transition"
+          className="mt-4 cursor-pointer inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl shadow hover:bg-blue-700 disabled:opacity-50 transition"
         >
           <CloudArrowUpIcon className="w-5 h-5" />
           {loading ? `⏳ Upload ${progress}%` : 'Uploader & Enregistrer'}
@@ -250,10 +241,11 @@ export default function AjouterProduitPage() {
         <DossierPreview structure={structure} />
       </div>
 
+      {/* ✅ Progress bar moderne */}
       {loading && (
-        <div className="fixed bottom-0 left-0 w-full h-2 bg-gray-200">
+        <div className="fixed bottom-0 left-0 w-full h-1 bg-gray-200">
           <div
-            className="bg-blue-600 h-2 transition-all duration-300"
+            className="bg-blue-600 h-1 transition-all duration-300 rounded-r"
             style={{ width: `${progress}%` }}
           />
         </div>

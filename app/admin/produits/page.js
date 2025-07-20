@@ -3,8 +3,8 @@
 import EditProductModal from '@/components/EditProductModal'
 import { useState, useEffect } from 'react'
 import dayjs from 'dayjs'
-import { PencilIcon, TrashIcon, ArchiveBoxIcon } from '@heroicons/react/24/outline'
-import { ChevronLeftIcon, ChevronRightIcon, XMarkIcon } from '@heroicons/react/20/solid'
+import { PencilIcon, TrashIcon, ArchiveBoxIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 
 const categoryColors = {
@@ -87,8 +87,8 @@ export default function ProduitsPage() {
   }
 
   return (
-    <main className="relative p-5 max-w-screen-xl mx-auto bg-white min-h-[70vh] text-gray-800">
-      
+    <main className="relative flex flex-col min-h-[80vh] p-5 max-w-7xl mx-auto bg-white text-gray-800">
+
       {/* ✅ Toast */}
       {toast.message && (
         <div className={`fixed top-28 left-1/2 -translate-x-1/2 px-4 py-2 rounded shadow text-white
@@ -102,107 +102,115 @@ export default function ProduitsPage() {
         <h1 className="text-2xl sm:text-3xl font-semibold text-blue-700">Tous les produits</h1>
       </div>
 
-      {loading && (
-        <div className="flex justify-center my-8">
-          <div className="w-7 h-7 animate-spin border-4 border-blue-500 border-t-transparent rounded-full" />
+      {/* ✅ Loader */}
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {[...Array(limit)].map((_, i) => (
+            <div key={i} className="animate-pulse bg-gray-100 p-4 rounded-xl space-y-4">
+              <div className="flex items-center space-x-4">
+                <div className="bg-gray-300 rounded w-20 h-20" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+                  <div className="h-3 bg-gray-300 rounded w-5/6"></div>
+                </div>
+              </div>
+              <div className="h-3 bg-gray-300 rounded w-full"></div>
+              <div className="flex space-x-2">
+                <div className="h-5 bg-gray-300 rounded w-10"></div>
+                <div className="h-5 bg-gray-300 rounded w-16"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : error ? (
+        <p className="text-center text-red-600">{error}</p>
+      ) : produits.length === 0 ? (
+        <p className="text-center text-gray-500 mt-8">Aucun produit trouvé.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {produits.map((p) => (
+            <div key={p._id} className="bg-gray-50 p-4 rounded-xl border shadow-sm space-y-3 relative">
+              <div className="flex items-start gap-4">
+                <Link href={`/admin/produits/${p._id}`}>
+                  <img src={p.image} alt={p.name} className="w-20 h-20 cursor-pointer object-cover rounded border" />
+                </Link>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-base sm:text-lg font-semibold truncate">{p.name}</h2>
+                    <span className="text-xs text-gray-400 italic">{dayjs(p.createdAt).format('DD/MM/YYYY HH:mm')}</span>
+                    <span className="text-xs text-gray-400 italic">| Maj {dayjs(p.updatedAt).format('DD/MM/YYYY HH:mm')}</span>
+                  </div>
+                  <p className="text-sm text-gray-700 mt-1">
+                    {p.description.length > 80 ? p.description.slice(0, 80) + '…' : p.description}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5 mt-2 items-center">
+                    <span className="text-xs font-medium text-gray-800">{p.price ? `💰 ${p.price} DA` : 'Prix non défini'}</span>
+                    {p.category.map((cat) => (
+                      <span key={cat} className={`text-[11px] px-2 py-0.5 rounded-full ml-2 ${categoryColors[cat] || 'bg-gray-100 text-gray-700'}`}>
+                        {cat}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 mt-3 relative">
+                    {p.motifs.map((motif, idx) => {
+                      const isOpen = openedMotif?.produitId === p._id && openedMotif.motifIndex === idx
+                      return (
+                        <div key={idx} className="relative">
+                          <button
+                            onClick={() => isOpen ? setOpenedMotif(null) : setOpenedMotif({ produitId: p._id, motifIndex: idx })}
+                            className={`text-xs px-2.5 py-0.5 rounded transition cursor-pointer
+                              ${isOpen ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
+                            {motif.nom}
+                          </button>
+                          {isOpen && (
+                            <div className="absolute z-20 left-0 mt-1 w-[260px] bg-white border border-gray-200 rounded-xl shadow-lg p-2 max-h-[200px] overflow-y-auto">
+                              <div className="flex justify-between items-center mb-1">
+                                <span className="text-xs font-semibold text-gray-800">{motif.nom}</span>
+                                <button onClick={() => setOpenedMotif(null)} className="p-0.5 text-gray-400 hover:text-red-500">
+                                  <XMarkIcon className="w-4 h-4" />
+                                </button>
+                              </div>
+                              {motif.calques.map((c, i) => (
+                                <div key={i} className="flex items-center gap-2 hover:bg-gray-50 rounded p-1">
+                                  <img src={c.image} alt={c.couleur} className="w-9 h-9 object-cover rounded border" />
+                                  <span className="text-xs text-gray-800 truncate min-w-[90px]">{c.couleur}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+                <div className="flex flex-col items-center gap-2 text-xs text-gray-500">
+                  <Link href={`/admin/produits/${p._id}`}>
+                    <button className="p-2 cursor-pointer bg-yellow-100 rounded hover:bg-yellow-200" title="Voir">👁️</button>
+                  </Link>
+                  <button onClick={() => setEditingProduct(p)} className="p-2 cursor-pointer bg-blue-100 rounded hover:bg-blue-200" title="Éditer">
+                    <PencilIcon className="w-4.5 h-4.5 text-blue-600" />
+                  </button>
+                  <button onClick={() => handleDeleteProduct(p)} className="p-2 cursor-pointer bg-red-100 rounded hover:bg-red-200" title="Supprimer">
+                    <TrashIcon className="w-4.5 h-4.5 text-red-600" />
+                  </button>
+                </div>
+              </div>
+              {deletingProductId === p._id && (
+                <div className="mt-2">
+                  <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                    <div className="bg-red-600 h-full transition-all duration-200" style={{ width: `${deleteProgress}%` }} />
+                  </div>
+                  <div className="text-xs text-red-600 text-center mt-1">Suppression... {deleteProgress}%</div>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )}
 
-      {error && <p className="text-center text-red-600">{error}</p>}
-
-      {!loading && produits.length === 0 && (
-        <p className="text-center text-gray-500 mt-8">Aucun produit trouvé.</p>
-      )}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        {produits.map((p) => (
-          <div key={p._id} className="bg-gray-50 p-4 rounded-xl border shadow-sm space-y-3 relative">
-            <div className="flex items-start gap-4">
-              <img src={p.image} alt={p.name} className="w-20 h-20 object-cover rounded border" />
-
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="text-base sm:text-lg font-semibold truncate">{p.name}</h2>
-                  <span className="text-xs text-gray-400 italic">{dayjs(p.createdAt).format('DD/MM/YYYY HH:mm')}</span>
-                  <span className="text-xs text-gray-400 italic">| Maj {dayjs(p.updatedAt).format('DD/MM/YYYY HH:mm')}</span>
-                </div>
-
-                <p className="text-sm text-gray-700 mt-1">
-                  {p.description.length > 80 ? p.description.slice(0, 80) + '…' : p.description}
-                </p>
-
-                <div className="flex flex-wrap gap-1.5 mt-2 items-center">
-                  <span className="text-xs font-medium text-gray-800">{p.price ? `💰 ${p.price} DA` : 'Prix non défini'}</span>
-                  {p.category.map((cat) => (
-                    <span key={cat} className={`text-[11px] px-2 py-0.5 rounded-full ml-2 ${categoryColors[cat] || 'bg-gray-100 text-gray-700'}`}>
-                      {cat}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex flex-wrap gap-1.5 mt-3 relative">
-                  {p.motifs.map((motif, idx) => {
-                    const isOpen = openedMotif?.produitId === p._id && openedMotif.motifIndex === idx
-                    return (
-                      <div key={idx} className="relative">
-                        <button
-                          onClick={() => isOpen ? setOpenedMotif(null) : setOpenedMotif({ produitId: p._id, motifIndex: idx })}
-                          className={`text-xs px-2.5 py-0.5 rounded ${isOpen ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
-                          {motif.nom}
-                        </button>
-                        {isOpen && (
-                          <div className="absolute z-20 left-0 mt-1 w-[260px] bg-white border border-gray-200 rounded-xl shadow-lg p-2 max-h-[200px] overflow-y-auto">
-                            <div className="flex justify-between items-center mb-1">
-                              <span className="text-xs font-semibold text-gray-800">{motif.nom}</span>
-                              <button onClick={() => setOpenedMotif(null)} className="p-0.5 text-gray-400 hover:text-red-500">
-                                <XMarkIcon className="w-4 h-4" />
-                              </button>
-                            </div>
-                            {motif.calques.map((c, i) => (
-                              <div key={i} className="flex items-center gap-2 hover:bg-gray-50 rounded p-1">
-                                <img src={c.image} alt={c.couleur} className="w-9 h-9 object-cover rounded border" />
-                                <span className="text-xs text-gray-800 truncate min-w-[90px]">{c.couleur}</span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-
-              <div className="flex flex-col items-center gap-2 text-xs text-gray-500">
-                {/* ✅ bouton Voir */}
-                <Link href={`/admin/produits/${p._id}`}>
-                  <button className="p-2 bg-yellow-100 rounded hover:bg-yellow-200" title="Voir">
-                    👁️
-                  </button>
-                </Link>
-
-                <button onClick={() => setEditingProduct(p)} className="p-2 bg-blue-100 rounded hover:bg-blue-200" title="Éditer">
-                  <PencilIcon className="w-4.5 h-4.5 text-blue-600" />
-                </button>
-
-                <button onClick={() => handleDeleteProduct(p)} className="p-2 bg-red-100 rounded hover:bg-red-200" title="Supprimer">
-                  <TrashIcon className="w-4.5 h-4.5 text-red-600" />
-                </button>
-              </div>
-            </div>
-
-            {deletingProductId === p._id && (
-              <div className="mt-2">
-                <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-                  <div className="bg-red-600 h-full transition-all duration-200" style={{ width: `${deleteProgress}%` }} />
-                </div>
-                <div className="text-xs text-red-600 text-center mt-1">Suppression... {deleteProgress}%</div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className="flex justify-center items-center gap-4 mt-10">
+      {/* ✅ Pagination sticky en bas */}
+      <div className="mt-auto sticky bottom-4 flex justify-center items-center gap-4 z-10">
         <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}
           className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 hover:bg-blue-200 disabled:opacity-40">
           <ChevronLeftIcon className="w-6 h-6 text-blue-700" />
@@ -227,7 +235,6 @@ export default function ProduitsPage() {
                 body: JSON.stringify(updatedProduct),
               })
               if (!res.ok) throw new Error('Erreur lors de la mise à jour')
-
               setProduits((prev) => prev.map((p) => (p._id === updatedProduct._id ? updatedProduct : p)))
               showToast('Produit mis à jour avec succès ✅')
               setEditingProduct(null)
