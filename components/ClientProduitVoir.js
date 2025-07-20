@@ -94,7 +94,7 @@ export default function ClientProduitVoir({ slug }) {
         <div className="flex justify-between items-center py-4 mb-8 border-b border-gray-200">
           <button
             onClick={() => window.history.back()}
-            className="flex items-center gap-2 text-xl text-neutral-700 hover:text-blue-600 transition-colors duration-200"
+            className=" cursor-pointer flex items-center gap-2 text-xl text-neutral-700 hover:text-blue-600 transition-colors duration-200"
           >
             <ChevronLeft className="w-6 h-6 text-blue-500" />
             <span>Retour</span>
@@ -166,7 +166,7 @@ export default function ClientProduitVoir({ slug }) {
             </div>
 
             {selectedMotif && (
-              <div className="w-full max-w-md h-28 overflow-y-auto flex flex-row-reverse flex-wrap gap-2 rounded-2xl p-3 bg-gray-50 shadow-inner">
+              <div className="w-full max-w-xl h-38 overflow-y-auto flex flex-row-reverse flex-wrap gap-1 rounded-2xl p-3 bg-gray-50 shadow-inner">
                 {selectedMotif.calques.map((calque, idx) => {
                   const paletteColor = palette.find(p => p.nom === calque.couleur)
                   return (
