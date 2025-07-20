@@ -28,6 +28,7 @@ export default function AdminHeader() {
       localStorage.removeItem('admin-auth')
       // router.push('/admin')
       // router.refresh() 
+      
       window.location.href = '/admin' // force un reload complet
     }
   }
