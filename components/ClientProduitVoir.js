@@ -165,6 +165,7 @@ export default function ClientProduitVoir({ slug }) {
               ))}
             </div>
 
+            
             {selectedMotif && (
               <div className="w-full max-w-xl h-38 overflow-y-auto flex flex-row-reverse flex-wrap gap-1 rounded-2xl p-3 bg-gray-50 shadow-inner">
                 {selectedMotif.calques.map((calque, idx) => {
