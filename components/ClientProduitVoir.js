@@ -191,7 +191,7 @@ export default function ClientProduitVoir({ slug }) {
                       <button
                         key={idx}
                         onClick={() => setSelectedColors(prev => ({ ...prev, [selectedMotif.nom]: calque.couleur }))}
-                        className={`w-5 h-5 cursor-pointer rounded-full border transition ${
+                        className={`w-5 h-5 border border-gray-300 cursor-pointer rounded-full  transition ${
                           selectedColors[selectedMotif.nom] === calque.couleur ? 'ring-2 ring-blue-600' : 'hover:scale-110'
                         }`}
                         style={{ backgroundColor: paletteColor?.hex || calque.couleur }}
