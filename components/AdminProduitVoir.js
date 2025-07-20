@@ -122,7 +122,7 @@ export default function AdminProduitVoir({ id }) {
         <div className="flex gap-6 flex-wrap lg:flex-nowrap mt-4">
           
           {/* ✅ Zone gauche */}
-          <div className="relative w-[450px] mx-auto overflow-hidden rounded-2xl shadow-lg bg-white">
+          <div className="relative w-[450px] h-[471px] mx-auto overflow-hidden rounded-2xl shadow-lg bg-white">
             <div className="absolute top-2 right-2 flex space-x-2 z-30">
               <button onClick={downloadImage} className="p-2 bg-gray-50 cursor-pointer rounded-full border hover:bg-gray-100 transition">
                 <Download size={20} className="text-gray-700" />
