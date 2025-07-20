@@ -26,9 +26,9 @@ export default function AdminHeader() {
       console.error('Erreur lors de la déconnexion', error)
     } finally {
       localStorage.removeItem('admin-auth')
-      // 🔄 Recharge pour s'assurer que tout est bien nettoyé
-      router.push('/admin')
-      router.refresh() // force un refresh si besoin
+      // router.push('/admin')
+      // router.refresh() 
+      window.location.href = '/admin' // force un reload complet
     }
   }
 
