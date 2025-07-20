@@ -170,7 +170,7 @@ export default function AdminProduitVoir({ id }) {
                 <button
                   key={idx}
                   onClick={() => setSelectedMotif(motif)}
-                  className={`px-4 py-2 text-base rounded-full border transition
+                  className={`px-4 py-2 cursor-pointer text-base rounded-full border transition
                     ${selectedMotif?.nom === motif.nom
                       ? 'bg-blue-600 text-white shadow'
                       : 'bg-gray-50 hover:bg-gray-100'}`}
@@ -188,7 +188,7 @@ export default function AdminProduitVoir({ id }) {
                     <button
                         key={idx}
                         onClick={() => setSelectedColors(prev => ({ ...prev, [selectedMotif.nom]: calque.couleur }))}
-                        className={`w-5 h-5 rounded-full border transition ${
+                        className={`w-5 h-5 cursor-pointer rounded-full border transition ${
                           selectedColors[selectedMotif.nom] === calque.couleur ? 'ring-2 ring-blue-600' : 'hover:scale-110'
                         }`}
                         style={{ backgroundColor: paletteColor?.hex || calque.couleur }}

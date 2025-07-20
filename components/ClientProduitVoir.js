@@ -84,7 +84,7 @@ export default function ClientProduitVoir({ slug }) {
         <div className="flex justify-between items-center py-4 mb-8 border-b border-gray-200">
           <button
             onClick={() => window.history.back()}
-            className="flex items-center gap-2 text-xl text-neutral-700 hover:text-blue-600 transition-colors"
+            className="flex cursor-pointer items-center gap-2 text-xl text-neutral-700 hover:text-blue-600 transition-colors"
           >
             <ChevronLeft className="w-6 h-6 text-blue-500" />
             <span>Retour</span>
@@ -93,7 +93,7 @@ export default function ClientProduitVoir({ slug }) {
             Composez votre design
           </p>
           <Link href="/">
-            <img src="/logo-2.svg" alt="Logo" className="h-10 w-auto" />
+            <img src="/logo-2.svg" alt="Logo" className="h-10 w-auto cursor-pointer" />
           </Link>
         </div>
 
@@ -172,7 +172,7 @@ export default function ClientProduitVoir({ slug }) {
                   <button
                     key={idx}
                     onClick={() => setSelectedMotif(motif)}
-                    className={`px-4 py-2 text-base rounded-full border transition ${
+                    className={`px-4 py-2 text-base rounded-full border transition cursor-pointer ${
                       selectedMotif?.nom === motif.nom
                         ? 'bg-blue-600 text-white shadow'
                         : 'bg-gray-50 hover:bg-gray-100'
@@ -191,7 +191,7 @@ export default function ClientProduitVoir({ slug }) {
                       <button
                         key={idx}
                         onClick={() => setSelectedColors(prev => ({ ...prev, [selectedMotif.nom]: calque.couleur }))}
-                        className={`w-5 h-5 rounded-full border transition ${
+                        className={`w-5 h-5 cursor-pointer rounded-full border transition ${
                           selectedColors[selectedMotif.nom] === calque.couleur ? 'ring-2 ring-blue-600' : 'hover:scale-110'
                         }`}
                         style={{ backgroundColor: paletteColor?.hex || calque.couleur }}
