@@ -100,7 +100,7 @@ export default function ClientProduitVoir({ slug }) {
         {/* ✅ Corps */}
         {loading ? (
           // Loader / skeleton
-          <div className="flex gap-8 mt-10 flex-wrap lg:flex-nowrap">
+          <div className="flex gap-8 mt-18 flex-wrap lg:flex-nowrap">
             <div className="w-[450px] h-[450px] bg-gray-100 rounded-2xl animate-pulse"></div>
             <div className="flex-1 flex flex-col space-y-6">
               <div className="flex flex-row-reverse items-center gap-4">

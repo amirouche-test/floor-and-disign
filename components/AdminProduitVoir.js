@@ -122,7 +122,7 @@ export default function AdminProduitVoir({ id }) {
         <div className="flex gap-6 flex-wrap lg:flex-nowrap mt-4">
           
           {/* ✅ Zone gauche */}
-          <div className="relative w-[450px] mx-auto overflow-hidden rounded-2xl shadow-lg bg-white border">
+          <div className="relative w-[450px] mx-auto overflow-hidden rounded-2xl shadow-lg bg-white">
             <div className="absolute top-2 right-2 flex space-x-2 z-30">
               <button onClick={downloadImage} className="p-2 bg-gray-50 cursor-pointer rounded-full border hover:bg-gray-100 transition">
                 <Download size={20} className="text-gray-700" />
@@ -181,19 +181,18 @@ export default function AdminProduitVoir({ id }) {
             </div>
 
             {selectedMotif && (
-              <div className="w-full max-w-xl h-24 overflow-y-auto flex flex-row-reverse flex-wrap gap-1 rounded-2xl p-2 bg-gray-50 shadow-inner">
+              <div className="w-full max-w-xl h-38 overflow-y-auto flex flex-row-reverse flex-wrap gap-1 rounded-2xl p-2 bg-gray-50 shadow-inner">
                 {selectedMotif.calques.map((calque, idx) => {
                   const paletteColor = palette.find(p => p.nom === calque.couleur)
                   return (
                     <button
-                      key={idx}
-                      onClick={() => setSelectedColors(prev => ({ ...prev, [selectedMotif.nom]: calque.couleur }))}
-                      className={`w-6 h-6 rounded-full border
-                        ${selectedColors[selectedMotif.nom] === calque.couleur
-                          ? 'ring-2 ring-blue-600 border-blue-400'
-                          : 'hover:scale-110 border-gray-300'}`}
-                      style={{ backgroundColor: paletteColor?.hex || calque.couleur }}
-                    />
+                        key={idx}
+                        onClick={() => setSelectedColors(prev => ({ ...prev, [selectedMotif.nom]: calque.couleur }))}
+                        className={`w-5 h-5 rounded-full border transition ${
+                          selectedColors[selectedMotif.nom] === calque.couleur ? 'ring-2 ring-blue-600' : 'hover:scale-110'
+                        }`}
+                        style={{ backgroundColor: paletteColor?.hex || calque.couleur }}
+                      />
                   )
                 })}
               </div>
